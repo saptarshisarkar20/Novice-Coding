@@ -37,7 +37,7 @@ This Repository consists of following programming languages
 
 ## Steps to setup this Repository Locally
 
-  1. Fork this repository to your account.
+  1. Fork and Star this repository to your account.
 
 ![PicsArt_10-04-08 04 45](https://user-images.githubusercontent.com/64744084/95018364-e7d2df00-067c-11eb-9989-5ed586adb11b.jpg)
 
