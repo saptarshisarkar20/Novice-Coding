@@ -51,7 +51,7 @@ This Repository consists of following programming languages
 
  3. Open the folder in your favourite code editor and add your changes or modifications.
  
-## Creating a PR 
+## Creating a Pull Request
  
  1. After making changes or modification on to your code locally, you need to add these files to the staging area.
 ```bash
@@ -74,3 +74,4 @@ This Repository consists of following programming languages
  7. That's it. You have opened a PR. Wait for it to get merged.
 
 ## Thank You for your Amazing Contribution!!
+
