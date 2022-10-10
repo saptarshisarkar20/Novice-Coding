@@ -1,0 +1,138 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int MX = 1e5 + 10;
+
+int n, a[MX][2], id[MX][2];
+long long seg[4 * MX], lazy[4 * MX][2];
+
+void updateNode(int idx, long long n, long long a, long long d) {
+    seg[idx] += n * a + (n * (n - 1)) / 2 * d;
+    
+    lazy[idx][0] += a;
+    lazy[idx][1] += d;
+    
+    return;
+}
+
+void shift(int idx, int st, int ed) {
+    int lft = 2 * idx, rgt = lft + 1, mid = (st + ed) / 2;
+    
+    if (lazy[idx][0] || lazy[idx][1]) {
+        updateNode(lft, mid - st + 1, lazy[idx][0], lazy[idx][1]);
+        updateNode(rgt, ed - mid, lazy[idx][0] + (mid - st + 1) * lazy[idx][1], lazy[idx][1]);
+        
+        lazy[idx][0] = lazy[idx][1] = 0;
+    }
+    
+    return;
+}
+
+void update(int s, int e, int a, int d, int idx = 1, int st = 0, int ed = n - 1) {
+    if (s > e || e < st || s > ed) return;
+    
+    if (s == st && e == ed) {
+        updateNode(idx, ed - st + 1, a, d);
+        
+        return;
+    }
+    
+    int lft = 2 * idx, rgt = lft + 1, mid = (st + ed) / 2;
+    
+    shift(idx, st, ed);
+    
+    update(s, min(e, mid), a, d, lft, st, mid), update(max(s, mid + 1), e, a + (s <= mid ? (mid - s + 1) * d : 0), d, rgt, mid + 1, ed);
+    
+    seg[idx] = seg[lft] + seg[rgt];
+    
+    return;
+}
+
+long long query(int x, int idx = 1, int st = 0, int ed = n - 1) {
+    if (x < st || ed < x) return 0;
+    
+    if (st == ed) return seg[idx];
+    
+    int lft = 2 * idx, rgt = lft + 1, mid = (st + ed) / 2;
+    
+    shift(idx, st, ed);
+    
+    long long ret = query(x, lft, st, mid) + query(x, rgt, mid + 1, ed);
+    
+    seg[idx] = seg[lft] + seg[rgt];
+    
+    return ret;
+}
+
+void add(int v, int c) {
+    if (id[v][0] < id[v][1]) {
+        update(0, id[v][0], c * (id[v][1] - id[v][0]), c);
+        update(id[v][0] + 1, id[v][0] + n - id[v][1] - 1, c * (n - id[v][1] - 1), -c);
+        update(id[v][0] + n - id[v][1], n - 1, 0, c);
+    } else if (id[v][0] > id[v][1]) {
+        update(0, id[v][0] - id[v][1] - 1, c * (id[v][0] - id[v][1]), -c);
+        update(id[v][0] - id[v][1], id[v][0], 0, c);
+        update(id[v][0] + 1, n - 1, c * (n - id[v][1] - 1), -c);
+    } else {
+        update(0, id[v][0], 0, c);
+        update(id[v][0] + 1, n - 1, c * (n - id[v][1] - 1), -c);
+    }
+    
+    return;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    
+    int t;
+    cin >> t;
+    
+    while (t--) {
+        int q, sh = 0;
+        cin >> n >> q;
+        
+        for (int i = 0; i < 4 * n; i++) {
+            seg[i] = lazy[i][0] = lazy[i][1] = 0;
+        }
+        
+        for (int j = 0; j < 2; j++) {
+            for (int i = 0; i < n; i++) {
+                cin >> a[i][j];
+                id[a[i][j]][j] = i;
+            }
+        }
+        
+        for (int i = 1; i <= n; i++) {
+            add(i, 1);
+        }
+        
+        while (q--) {
+            int t, x;
+            cin >> t >> x;
+            
+            if (t == 1) {
+                sh = sh + x - (sh + x >= n ? n : 0);
+            } else {
+                int y;
+                cin >> y;
+                x--, y--;
+                
+                add(a[x][1], -1);
+                add(a[y][1], -1);
+                
+                swap(a[x][1], a[y][1]);
+                swap(id[a[x][1]][1], id[a[y][1]][1]);
+                
+                add(a[x][1], 1);
+                add(a[y][1], 1);
+            }
+            
+            cout << query(sh) << endl;
+        }
+    }
+
+    return 0;
+}
